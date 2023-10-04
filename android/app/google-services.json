@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "114798246639",
+    "project_id": "stanford-c9258",
+    "storage_bucket": "stanford-c9258.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114798246639:android:81dc025ff92e215435791a",
+        "android_client_info": {
+          "package_name": "com.example.stanford"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZS2UpwcmUflo-82_ZdVolE8jA6yx2brs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
