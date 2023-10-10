@@ -3,13 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:routemaster/routemaster.dart';
+import 'theme/pallete.dart';
 import 'package:stanford/authentication/auth_controller.dart';
 import 'package:stanford/authentication/auth_repository.dart';
 import 'package:stanford/models/citizen.dart';
-import 'responsive/mobile_screen_layout.dart';
-import 'responsive/responsive_layout_screen.dart';
-import 'responsive/web_screen_layout.dart';
-import 'package:stanford/authentication/auth_cheats/auth_cheats_screen.dart';
+import 'package:stanford/router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,36 +47,27 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
-          if (snapshot.connectionState == ConnectionState.active) {
-            if (snapshot.hasData) {
-              getData(ref, snapshot.data!);
-              return const ResponsiveLayout(
-                webScreenLayout: WebScreenLayout(),
-                mobileScreenLayout: MobileScreenLayout(),
-              );
-            } else if (snapshot.hasError) {
-              return Center(
-                child: Text(snapshot.error.toString()),
-              );
-            }
-          }
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
+    return ref.watch(authStateChangeProvider).when(
+        data: (data) => MaterialApp.router(
+              //TODO figure out theming button theme, etc.
+              theme: Pallete.pastelTheme,
+              routerDelegate: RoutemasterDelegate(
+                routesBuilder: (context) {
+                  if (data != null) {
+                    getData(ref, data);
+                    if (citizenUser != null) {
+                      return loggedInRoute;
+                    }
+                  }
+                  return loggedOutRoute;
+                },
+              ),
+              routeInformationParser: const RoutemasterParser(),
+              title: 'Hello World!',
+            ),
+        error: (error, stackTrace) => const Center(child: Text('error')),
+        loading: () => const Center(
               child: CircularProgressIndicator(),
-            );
-          }
-          return const AuthCheatsScreen();
-        },
-      ),
-    );
+            ));
   }
 }

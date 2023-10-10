@@ -8,8 +8,17 @@ import '../utils/constants.dart';
 import '../models/citizen.dart';
 import 'name_engine/name_engine.dart';
 
-final authRepositoryProvider = Provider((ref) => AuthRepository(
-    firestore: ref.read(firestoreProvider), auth: ref.read(authProvider)));
+final authRepositoryProvider = Provider(
+  (ref) => AuthRepository(
+    firestore: ref.read(firestoreProvider),
+    auth: ref.read(authProvider),
+  ),
+);
+
+final authStateChangeProvider = StreamProvider((ref) {
+  final authThingy = ref.watch(authRepositoryProvider);
+  return authThingy.authStateChange;
+});
 
 class AuthRepository {
   final FirebaseAuth _auth;
@@ -22,23 +31,7 @@ class AuthRepository {
   CollectionReference get _citizens =>
       _firestore.collection(FirestoreConstants.citizenCollection);
 
-  Future<void> createNewCitizenAccount(String email, String password) async {
-    // _citizens.doc()
-    try {
-      await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-    } catch (e) {
-      return;
-    }
-  }
-
-  Future<void> signIn(String email, String password) async {
-    try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-    } catch (e) {
-      return;
-    }
-  }
+  Stream<User?> get authStateChange => _auth.authStateChanges();
 
   FutureEitherFailureOr<Citizen> signUpOrLogIn(
       String email, String password, bool isNewUser) async {

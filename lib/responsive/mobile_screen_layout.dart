@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:routemaster/routemaster.dart';
 import 'package:stanford/authentication/auth_controller.dart';
-import 'package:stanford/models/citizen.dart';
-
-import '../screens/create_article_screen.dart';
+import '../screens/locale_articles_page.dart';
+import '../utils/type_defs.dart';
 
 class MobileScreenLayout extends ConsumerStatefulWidget {
   const MobileScreenLayout({super.key});
@@ -14,6 +14,16 @@ class MobileScreenLayout extends ConsumerStatefulWidget {
 }
 
 class _MobileScreenLayoutState extends ConsumerState<MobileScreenLayout> {
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  
+
   @override
   Widget build(BuildContext context) {
     final citizen = ref.watch(citizenProvider);
@@ -23,8 +33,7 @@ class _MobileScreenLayoutState extends ConsumerState<MobileScreenLayout> {
         leading: PopupMenuButton(
             onSelected: (value) {
               if (value == 'create') {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => const CreateArticleScreen()));
+                Routemaster.of(context).push('/create-article');
               }
             },
             icon: const Icon(Icons.menu),
@@ -43,7 +52,43 @@ class _MobileScreenLayoutState extends ConsumerState<MobileScreenLayout> {
                   ),
                 ]),
       ),
-      body: const Placeholder(),
+      body: PageView(
+        controller: _pageController,
+        children: const [
+          LocaleArticlesPage(Locale.local),
+          LocaleArticlesPage(Locale.state),
+          LocaleArticlesPage(Locale.national),
+          LocaleArticlesPage(Locale.global),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dnd_forwardslash),
+            backgroundColor: Colors.grey,
+            label: 'local',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dnd_forwardslash),
+            backgroundColor: Colors.grey,
+            label: 'Michigan',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dnd_forwardslash),
+            backgroundColor: Colors.grey,
+            label: 'USA',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dnd_forwardslash),
+            backgroundColor: Colors.grey,
+            label: 'World',
+          ),
+        ],
+        onTap: (value) {
+          _pageController.jumpToPage(value);
+        },
+        showUnselectedLabels: true,
+      ),
     );
   }
 }

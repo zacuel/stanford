@@ -10,17 +10,16 @@ final citizenProvider = StateProvider<Citizen?>((ref) => null);
 final authControllerProvider = StateNotifierProvider<AuthController, bool>(
   (ref) => AuthController(
     authRepository: ref.watch(authRepositoryProvider),
-    ref: ref,
   ),
 );
 
 class AuthController extends StateNotifier<bool> {
   final AuthRepository _authRepository;
-  final Ref _ref;
+  // final Ref _ref;
 
-  AuthController({required AuthRepository authRepository, required Ref ref})
+  AuthController({required AuthRepository authRepository})
       : _authRepository = authRepository,
-        _ref = ref,
+        // _ref = ref,
         super(false);
 
   Future<void> signUpOrLogIn(String email, String password, bool isNewUser,
@@ -29,7 +28,10 @@ class AuthController extends StateNotifier<bool> {
     final result =
         await _authRepository.signUpOrLogIn(email, password, isNewUser);
     state = false;
-    result.fold((l) => showSnackBar(context, l.message),
-        (r) => _ref.read(citizenProvider.notifier).update((state) => r));
+    result.fold(
+      (l) => showSnackBar(context, l.message),
+      (r) {},
+      // (r) => _ref.read(citizenProvider.notifier).update((state) => r),
+    );
   }
 }
